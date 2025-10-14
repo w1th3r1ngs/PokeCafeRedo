@@ -33,14 +33,28 @@ export default function Menu() {
       ? menuItems
       : menuItems.filter((item) => item.categoryId === selectedCategory);
 
-  const handleAddToCart = (item: MenuItem) => {
+  const handleAddToCart = (item: MenuItem, size?: "klein" | "standard") => {
+    // Determine the correct price based on size
+    let finalPrice = item.price;
+    if (size && item.hasSizeOptions === 1) {
+      if (size === "klein" && item.priceSmall) {
+        finalPrice = item.priceSmall;
+      } else if (size === "standard" && item.priceLarge) {
+        finalPrice = item.priceLarge;
+      }
+    }
+
+    // Create unique cart ID per size to allow both sizes in cart simultaneously
+    const cartItemId = size ? `${item.id}-${size}` : item.id;
+
     addItem({
-      id: item.id,
+      id: cartItemId,
       menuItemId: item.id,
       name: item.name,
       nameDE: item.nameDE,
-      price: item.price,
+      price: finalPrice,
       image: item.image,
+      size: size,
     });
   };
 
@@ -151,13 +165,24 @@ export default function Menu() {
                       {item.descriptionDE}
                     </p>
                     <div className="flex items-center justify-between">
-                      <span className="font-poppins text-2xl font-bold text-ocean" data-testid={`text-menu-item-price-${item.id}`}>
-                        €{item.price}
-                      </span>
+                      <div>
+                        <span className="font-poppins text-2xl font-bold text-ocean" data-testid={`text-menu-item-price-${item.id}`}>
+                          {item.hasSizeOptions === 1 && "ab "}€{item.priceSmall || item.price}
+                        </span>
+                        {item.hasSizeOptions === 1 && (
+                          <p className="text-xs text-muted-foreground mt-1">Klein/Standard</p>
+                        )}
+                      </div>
                       <Button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleAddToCart(item);
+                          // If item has size options, open dialog instead
+                          if (item.hasSizeOptions === 1) {
+                            setSelectedItem(item);
+                            setItemDialogOpen(true);
+                          } else {
+                            handleAddToCart(item);
+                          }
                         }}
                         disabled={item.available === 0}
                         className="bg-sunset hover:bg-sunset-dark text-white font-poppins font-bold rounded-full px-6 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"

@@ -69,6 +69,11 @@ export function CartModal({ isOpen, onClose }: CartModalProps) {
                     <h3 className="font-poppins font-bold text-foreground mb-1" data-testid={`text-cart-item-name-${item.id}`}>
                       {item.nameDE}
                     </h3>
+                    {item.size && (
+                      <p className="font-lato text-xs text-muted-foreground mb-1" data-testid={`text-cart-item-size-${item.id}`}>
+                        Größe: {item.size === "klein" ? "Klein" : "Standard"}
+                      </p>
+                    )}
                     <p className="font-poppins text-lg font-bold text-ocean" data-testid={`text-cart-item-price-${item.id}`}>
                       €{item.price}
                     </p>

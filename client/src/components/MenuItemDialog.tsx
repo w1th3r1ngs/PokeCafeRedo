@@ -3,16 +3,38 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Plus } from "lucide-react";
 import type { MenuItem } from "@shared/schema";
+import { useState, useEffect } from "react";
 
 interface MenuItemDialogProps {
   item: MenuItem | null;
   isOpen: boolean;
   onClose: () => void;
-  onAddToCart: (item: MenuItem) => void;
+  onAddToCart: (item: MenuItem, size?: "klein" | "standard") => void;
 }
 
 export function MenuItemDialog({ item, isOpen, onClose, onAddToCart }: MenuItemDialogProps) {
+  const [selectedSize, setSelectedSize] = useState<"klein" | "standard">("standard");
+
+  // Reset to default size when dialog opens or item changes
+  useEffect(() => {
+    if (isOpen && item?.hasSizeOptions === 1) {
+      setSelectedSize("standard");
+    }
+  }, [item, isOpen]);
+
   if (!item) return null;
+
+  // Calculate the displayed price based on selected size
+  const getDisplayPrice = () => {
+    if (item.hasSizeOptions === 1) {
+      if (selectedSize === "klein" && item.priceSmall) {
+        return item.priceSmall;
+      } else if (selectedSize === "standard" && item.priceLarge) {
+        return item.priceLarge;
+      }
+    }
+    return item.price;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -43,6 +65,49 @@ export function MenuItemDialog({ item, isOpen, onClose, onAddToCart }: MenuItemD
           <p className="font-lato text-muted-foreground" data-testid="text-dialog-description">
             {item.descriptionDE}
           </p>
+
+          {/* Size Selection */}
+          {item.hasSizeOptions === 1 && (
+            <div>
+              <h4 className="font-poppins font-semibold text-sm mb-3 text-foreground">Größe wählen</h4>
+              <div className="flex gap-3">
+                <Button
+                  variant={selectedSize === "klein" ? "default" : "outline"}
+                  onClick={() => setSelectedSize("klein")}
+                  className={`flex-1 font-poppins font-semibold ${
+                    selectedSize === "klein" 
+                      ? "bg-ocean hover:bg-ocean/90 text-white" 
+                      : ""
+                  }`}
+                  data-testid="button-size-klein"
+                >
+                  <div className="text-center">
+                    <div>Klein</div>
+                    {item.priceSmall && (
+                      <div className="text-sm font-normal">€{item.priceSmall}</div>
+                    )}
+                  </div>
+                </Button>
+                <Button
+                  variant={selectedSize === "standard" ? "default" : "outline"}
+                  onClick={() => setSelectedSize("standard")}
+                  className={`flex-1 font-poppins font-semibold ${
+                    selectedSize === "standard" 
+                      ? "bg-ocean hover:bg-ocean/90 text-white" 
+                      : ""
+                  }`}
+                  data-testid="button-size-standard"
+                >
+                  <div className="text-center">
+                    <div>Standard</div>
+                    {item.priceLarge && (
+                      <div className="text-sm font-normal">€{item.priceLarge}</div>
+                    )}
+                  </div>
+                </Button>
+              </div>
+            </div>
+          )}
 
           {/* Protein */}
           {item.protein && (
@@ -120,15 +185,12 @@ export function MenuItemDialog({ item, isOpen, onClose, onAddToCart }: MenuItemD
           <div className="flex items-center justify-between pt-4 border-t">
             <div>
               <span className="font-poppins text-3xl font-bold text-ocean" data-testid="text-dialog-price">
-                €{item.price}
+                €{getDisplayPrice()}
               </span>
-              {item.hasSizeOptions === 1 && (
-                <p className="text-xs text-muted-foreground mt-1">Klein / Standard-Größe verfügbar</p>
-              )}
             </div>
             <Button
               onClick={() => {
-                onAddToCart(item);
+                onAddToCart(item, item.hasSizeOptions === 1 ? selectedSize : undefined);
                 onClose();
               }}
               disabled={item.available === 0}
