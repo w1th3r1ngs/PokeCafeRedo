@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { Hero } from "@/components/Hero";
+import { Gallery3D } from "@/components/Gallery3D";
 import { Truck, ShoppingBag, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -133,6 +134,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* 3D Gallery Section */}
+      <Gallery3D />
     </div>
   );
 }
