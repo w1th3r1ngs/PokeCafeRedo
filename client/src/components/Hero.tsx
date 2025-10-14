@@ -6,20 +6,136 @@ export function Hero() {
   return (
     <section className="relative h-[80vh] min-h-[500px] flex items-center justify-center text-center text-white px-6 overflow-hidden">
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/40 z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-ocean/80 via-ocean-dark/70 to-sunset/60 z-10" />
 
-      {/* Animated Background - Marquee */}
-      <div className="absolute inset-0 w-[200%] h-full flex animate-marquee">
-        <img
-          src="https://i.imgur.com/rS2yP6g.jpeg"
-          className="w-1/2 h-full object-cover"
-          alt="Delicious Poke Bowl"
-        />
-        <img
-          src="https://i.imgur.com/rS2yP6g.jpeg"
-          className="w-1/2 h-full object-cover"
-          alt="Delicious Poke Bowl"
-        />
+      {/* Animated Background - Rotating Circles */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        {/* Ring 1 - Outer, slowest */}
+        <div className="absolute animate-rotate-slow">
+          <div className="relative w-[800px] h-[800px]">
+            {[...Array(12)].map((_, i) => {
+              const angle = (i * 360) / 12;
+              const isPokebal = i % 2 === 0;
+              return (
+                <div
+                  key={`ring1-${i}`}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    transform: `rotate(${angle}deg) translateY(-400px)`,
+                  }}
+                >
+                  {isPokebal ? (
+                    <div className="w-12 h-12 rounded-full bg-white border-4 border-foreground/20 flex items-center justify-center shadow-xl">
+                      <div className="w-5 h-5 rounded-full bg-sunset"></div>
+                    </div>
+                  ) : (
+                    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-ocean to-ocean-dark shadow-xl flex items-center justify-center border-2 border-white/30">
+                      <div className="text-2xl">🍜</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Ring 2 - Middle, medium speed */}
+        <div className="absolute animate-rotate-medium">
+          <div className="relative w-[600px] h-[600px]">
+            {[...Array(10)].map((_, i) => {
+              const angle = (i * 360) / 10;
+              const isBowl = i % 2 === 1;
+              return (
+                <div
+                  key={`ring2-${i}`}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    transform: `rotate(${angle}deg) translateY(-300px)`,
+                  }}
+                >
+                  {isBowl ? (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sunset to-gold shadow-xl flex items-center justify-center border-2 border-white/30">
+                      <div className="text-xl">🥗</div>
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-white border-4 border-foreground/20 flex items-center justify-center shadow-xl">
+                      <div className="w-4 h-4 rounded-full bg-ocean"></div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Ring 3 - Inner, fastest */}
+        <div className="absolute animate-rotate-fast">
+          <div className="relative w-[400px] h-[400px]">
+            {[...Array(8)].map((_, i) => {
+              const angle = (i * 360) / 8;
+              const isPokebal = i % 2 === 0;
+              return (
+                <div
+                  key={`ring3-${i}`}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    transform: `rotate(${angle}deg) translateY(-200px)`,
+                  }}
+                >
+                  {isPokebal ? (
+                    <div className="w-8 h-8 rounded-full bg-white border-3 border-foreground/20 flex items-center justify-center shadow-lg">
+                      <div className="w-3 h-3 rounded-full bg-gold"></div>
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-ocean-dark to-ocean shadow-lg flex items-center justify-center border-2 border-white/30">
+                      <div className="text-lg">🍲</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Ring 4 - Very outer ring, very slow, opposite direction */}
+        <div className="absolute animate-rotate-reverse-slow">
+          <div className="relative w-[1000px] h-[1000px]">
+            {[...Array(16)].map((_, i) => {
+              const angle = (i * 360) / 16;
+              const type = i % 4;
+              return (
+                <div
+                  key={`ring4-${i}`}
+                  className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                  style={{
+                    transform: `rotate(${angle}deg) translateY(-500px)`,
+                  }}
+                >
+                  {type === 0 && (
+                    <div className="w-10 h-10 rounded-full bg-white border-3 border-foreground/15 flex items-center justify-center shadow-lg opacity-70">
+                      <div className="w-4 h-4 rounded-full bg-ocean-dark"></div>
+                    </div>
+                  )}
+                  {type === 1 && (
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-gold to-sunset shadow-lg flex items-center justify-center border-2 border-white/20 opacity-70">
+                      <div className="text-lg">🍱</div>
+                    </div>
+                  )}
+                  {type === 2 && (
+                    <div className="w-9 h-9 rounded-full bg-white border-3 border-foreground/15 flex items-center justify-center shadow-lg opacity-70">
+                      <div className="w-4 h-4 rounded-full bg-sunset"></div>
+                    </div>
+                  )}
+                  {type === 3 && (
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-ocean to-sunset shadow-lg flex items-center justify-center border-2 border-white/20 opacity-70">
+                      <div className="text-xl">🥙</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Content */}

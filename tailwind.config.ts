@@ -121,6 +121,22 @@ export default {
           from: { transform: "scale(0)" },
           to: { transform: "scale(1)" },
         },
+        "rotate-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "rotate-medium": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "rotate-fast": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "rotate-reverse": {
+          from: { transform: "rotate(360deg)" },
+          to: { transform: "rotate(0deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -128,6 +144,10 @@ export default {
         "marquee": "marquee 80s linear infinite",
         "fade-in": "fade-in 0.5s ease-in-out",
         "scale-in": "scale-in 0.3s ease-out",
+        "rotate-slow": "rotate-slow 60s linear infinite",
+        "rotate-medium": "rotate-medium 40s linear infinite",
+        "rotate-fast": "rotate-fast 25s linear infinite",
+        "rotate-reverse-slow": "rotate-reverse 80s linear infinite",
       },
     },
   },
