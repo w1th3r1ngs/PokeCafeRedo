@@ -1,4 +1,4 @@
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import { useRef, type ReactNode } from "react";
 
 interface AnimatedSectionProps {
@@ -15,13 +15,15 @@ export function AnimatedSection({
   direction = "up"
 }: AnimatedSectionProps) {
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
+  const shouldReduceMotion = useReducedMotion();
 
+  // Reduced movement distance for subtlety
   const directionOffset = {
-    up: { y: 40 },
-    down: { y: -40 },
-    left: { x: 40 },
-    right: { x: -40 },
+    up: { y: shouldReduceMotion ? 0 : 15 },
+    down: { y: shouldReduceMotion ? 0 : -15 },
+    left: { x: shouldReduceMotion ? 0 : 15 },
+    right: { x: shouldReduceMotion ? 0 : -15 },
     none: {}
   };
 
@@ -39,9 +41,9 @@ export function AnimatedSection({
         x: 0
       } : {}}
       transition={{
-        duration: 0.6,
-        delay: delay,
-        ease: [0.21, 0.45, 0.27, 0.9]
+        duration: shouldReduceMotion ? 0.2 : 0.4,
+        delay: shouldReduceMotion ? 0 : delay,
+        ease: "easeOut"
       }}
     >
       {children}

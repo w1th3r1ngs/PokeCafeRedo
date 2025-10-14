@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { CartWidget } from "@/components/CartWidget";
 import { CartModal } from "@/components/CartModal";
 import { MenuItemDialog } from "@/components/MenuItemDialog";
+import { AnimatedSection } from "@/components/AnimatedSection";
 import { useCartStore } from "@/lib/cartStore";
 import type { MenuItem, Category } from "@shared/schema";
 
@@ -129,16 +130,19 @@ export default function Menu() {
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredItems.map((item) => (
-                <Card
+              {filteredItems.map((item, index) => (
+                <AnimatedSection 
                   key={item.id}
-                  className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group cursor-pointer"
-                  data-testid={`card-menu-item-${item.id}`}
-                  onClick={() => {
-                    setSelectedItem(item);
-                    setItemDialogOpen(true);
-                  }}
+                  delay={index * 0.05}
                 >
+                  <Card
+                    className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer"
+                    data-testid={`card-menu-item-${item.id}`}
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setItemDialogOpen(true);
+                    }}
+                  >
                   <div className="relative aspect-[16/9] overflow-hidden">
                     <img
                       src={item.image}
@@ -198,7 +202,8 @@ export default function Menu() {
                       </p>
                     )}
                   </div>
-                </Card>
+                  </Card>
+                </AnimatedSection>
               ))}
             </div>
           )}
