@@ -1,5 +1,7 @@
-import { Phone, MapPin, Clock, Mail } from "lucide-react";
+import { Phone, MapPin, Clock, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { ReservationForm } from "@/components/ReservationForm";
+import { Button } from "@/components/ui/button";
 
 export default function Contact() {
   return (
@@ -86,6 +88,82 @@ export default function Contact() {
                 title="PokePao Location Map"
                 data-testid="iframe-map"
               />
+            </div>
+          </div>
+
+          {/* Reservation Form */}
+          <div className="mb-16">
+            <h2 className="font-poppins text-3xl md:text-4xl font-bold text-ocean mb-8 text-center" data-testid="text-reservation-section-title">
+              Tisch reservieren
+            </h2>
+            <ReservationForm />
+          </div>
+
+          {/* Reviews Section */}
+          <div className="mb-16">
+            <h2 className="font-poppins text-3xl md:text-4xl font-bold text-ocean mb-4 text-center" data-testid="text-reviews-title">
+              Was unsere Gäste sagen
+            </h2>
+            <p className="text-center text-muted-foreground mb-8 font-lato" data-testid="text-reviews-subtitle">
+              Echte Bewertungen von echten Genießern.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {/* Review 1 */}
+              <Card className="p-6" data-testid="card-review-1">
+                <div className="flex gap-1 mb-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="w-5 h-5 fill-sunset text-sunset" />
+                  ))}
+                </div>
+                <p className="font-lato text-muted-foreground italic mb-4" data-testid="text-review-1">
+                  "Super lecker und frisch zubereitet. Die Auswahl ist riesig und das Personal sehr freundlich. Absolute Empfehlung!"
+                </p>
+                <p className="font-poppins font-bold text-ocean" data-testid="text-reviewer-1">- Jennifer L.</p>
+              </Card>
+
+              {/* Review 2 */}
+              <Card className="p-6" data-testid="card-review-2">
+                <div className="flex gap-1 mb-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="w-5 h-5 fill-sunset text-sunset" />
+                  ))}
+                </div>
+                <p className="font-lato text-muted-foreground italic mb-4" data-testid="text-review-2">
+                  "Beste Poke Bowl in Hamburg! Die Zutaten sind immer frisch, die Saucen sind der Hammer und die Portionen machen satt. Wir kommen immer wieder gerne."
+                </p>
+                <p className="font-poppins font-bold text-ocean" data-testid="text-reviewer-2">- Max R.</p>
+              </Card>
+
+              {/* Review 3 */}
+              <Card className="p-6" data-testid="card-review-3">
+                <div className="flex gap-1 mb-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <Star key={star} className="w-5 h-5 fill-sunset text-sunset" />
+                  ))}
+                </div>
+                <p className="font-lato text-muted-foreground italic mb-4" data-testid="text-review-3">
+                  "Ein kleines Stück Hawaii in Barmbek. Alles wird mit Liebe gemacht, das schmeckt man einfach. Der Laden ist klein aber fein."
+                </p>
+                <p className="font-poppins font-bold text-ocean" data-testid="text-reviewer-3">- David S.</p>
+              </Card>
+            </div>
+
+            <div className="text-center">
+              <Button
+                asChild
+                variant="outline"
+                className="font-poppins font-bold rounded-full px-8 py-6 border-2 border-ocean text-ocean hover:bg-ocean hover:text-white"
+                data-testid="button-more-reviews"
+              >
+                <a 
+                  href="https://www.google.com/maps/place/Pok%C3%A9+Pao+%E2%80%93+Frische+Pok%C3%A9+Bowls+%26+gesundes+Caf%C3%A9+in+Hamburg+(Barmbek)/@53.600353,10.0413782,17z/data=!4m8!3m7!1s0x47b189f7f4a00893:0xea8636b5afc20ba1!8m2!3d53.600353!4d10.0413782!9m1!1b1!16s%2Fg%2F11s990jl7w?entry=ttu&g_ep=EgoyMDI1MTAwOC4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Mehr auf Google Maps lesen
+                </a>
+              </Button>
             </div>
           </div>
 
