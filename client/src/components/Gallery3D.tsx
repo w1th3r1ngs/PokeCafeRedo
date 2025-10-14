@@ -2,10 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ChevronLeft, ChevronRight, Upload, X } from "lucide-react";
+import { X } from "lucide-react";
 import { type GalleryImage } from "@shared/schema";
 
 const defaultImages = [
@@ -16,8 +13,9 @@ const defaultImages = [
 
 export function Gallery3D() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploadFilename, setUploadFilename] = useState("");
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -26,38 +24,6 @@ export function Gallery3D() {
   });
 
   const allImages = [...defaultImages, ...uploadedImages];
-
-  const uploadMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const response = await fetch("/api/gallery", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-      
-      if (!response.ok) {
-        throw new Error("Upload failed");
-      }
-      
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/gallery"] });
-      toast({
-        title: "Bild hochgeladen!",
-        description: "Das Bild wurde erfolgreich zur Galerie hinzugefügt.",
-      });
-      setSelectedFile(null);
-      setUploadFilename("");
-    },
-    onError: () => {
-      toast({
-        variant: "destructive",
-        title: "Fehler",
-        description: "Bild konnte nicht hochgeladen werden. Bitte versuchen Sie es erneut.",
-      });
-    },
-  });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -81,29 +47,35 @@ export function Gallery3D() {
     },
   });
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % allImages.length);
+  const handleMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart(e.clientX);
+    setDragOffset(0);
   };
 
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging) return;
+    const offset = e.clientX - dragStart;
+    setDragOffset(offset);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-      if (!uploadFilename) {
-        setUploadFilename(e.target.files[0].name);
-      }
+  const handleMouseUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    
+    const threshold = 50;
+    if (dragOffset > threshold) {
+      setCurrentIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+    } else if (dragOffset < -threshold) {
+      setCurrentIndex((prev) => (prev + 1) % allImages.length);
     }
+    
+    setDragOffset(0);
   };
 
-  const handleUpload = () => {
-    if (selectedFile) {
-      const formData = new FormData();
-      formData.append("image", selectedFile);
-      formData.append("filename", uploadFilename || selectedFile.name);
-      uploadMutation.mutate(formData);
+  const handleMouseLeave = () => {
+    if (isDragging) {
+      handleMouseUp();
     }
   };
 
@@ -121,9 +93,11 @@ export function Gallery3D() {
     const isCenter = adjustedDiff === 0;
     const absAdjustedDiff = Math.abs(adjustedDiff);
     
+    const dragOffsetPercent = isDragging ? (dragOffset / window.innerWidth) * 100 : 0;
+    
     return {
       transform: `
-        translateX(${adjustedDiff * 85}%) 
+        translateX(${adjustedDiff * 85 + dragOffsetPercent}%) 
         translateZ(${isCenter ? 0 : -absAdjustedDiff * 200}px) 
         rotateY(${adjustedDiff * -15}deg)
         scale(${isCenter ? 1 : 1 - absAdjustedDiff * 0.2})
@@ -145,8 +119,14 @@ export function Gallery3D() {
 
         {/* 3D Carousel */}
         <div className="relative mb-16">
-          <div className="perspective-1000 h-[400px] md:h-[500px] relative overflow-hidden">
-            <div className="absolute inset-0 flex items-center justify-center preserve-3d">
+          <div 
+            className="perspective-1000 h-[400px] md:h-[500px] relative overflow-hidden cursor-grab active:cursor-grabbing"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div className="absolute inset-0 flex items-center justify-center preserve-3d select-none">
               {allImages.map((image, index) => (
                 <div
                   key={image.id}
@@ -174,71 +154,7 @@ export function Gallery3D() {
               ))}
             </div>
           </div>
-
-          {/* Navigation Buttons */}
-          <Button
-            onClick={prevSlide}
-            variant="outline"
-            size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full z-20 bg-white/90 hover:bg-white"
-            data-testid="button-prev"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </Button>
-          <Button
-            onClick={nextSlide}
-            variant="outline"
-            size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full z-20 bg-white/90 hover:bg-white"
-            data-testid="button-next"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </Button>
         </div>
-
-        {/* Upload Form */}
-        <Card className="p-6 md:p-8 max-w-2xl mx-auto">
-          <h3 className="font-poppins text-xl md:text-2xl font-bold text-ocean mb-6" data-testid="text-upload-title">
-            Bild zur Galerie hinzufügen
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="image-file">Bild auswählen</Label>
-              <Input
-                id="image-file"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                data-testid="input-image-file"
-              />
-              {selectedFile && (
-                <p className="text-sm text-muted-foreground mt-2" data-testid="text-selected-file">
-                  Ausgewählt: {selectedFile.name}
-                </p>
-              )}
-            </div>
-            <div>
-              <Label htmlFor="image-name">Bildname (optional)</Label>
-              <Input
-                id="image-name"
-                type="text"
-                placeholder="Beschreibung des Bildes"
-                value={uploadFilename}
-                onChange={(e) => setUploadFilename(e.target.value)}
-                data-testid="input-image-name"
-              />
-            </div>
-            <Button
-              onClick={handleUpload}
-              disabled={!selectedFile || uploadMutation.isPending}
-              className="w-full bg-ocean hover:bg-ocean-dark font-poppins"
-              data-testid="button-upload"
-            >
-              <Upload className="w-4 h-4 mr-2" />
-              {uploadMutation.isPending ? "Wird hochgeladen..." : "Bild hochladen"}
-            </Button>
-          </div>
-        </Card>
       </div>
 
       <style>{`
