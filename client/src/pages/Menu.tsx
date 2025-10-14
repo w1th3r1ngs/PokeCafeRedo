@@ -3,14 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { CartWidget } from "@/components/CartWidget";
 import { CartModal } from "@/components/CartModal";
+import { MenuItemDialog } from "@/components/MenuItemDialog";
 import { useCartStore } from "@/lib/cartStore";
 import type { MenuItem, Category } from "@shared/schema";
 
 export default function Menu() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [cartModalOpen, setCartModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
+  const [itemDialogOpen, setItemDialogOpen] = useState(false);
   const { addItem } = useCartStore();
 
   // Fetch categories
@@ -114,8 +118,12 @@ export default function Menu() {
               {filteredItems.map((item) => (
                 <Card
                   key={item.id}
-                  className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group"
+                  className="overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 group cursor-pointer"
                   data-testid={`card-menu-item-${item.id}`}
+                  onClick={() => {
+                    setSelectedItem(item);
+                    setItemDialogOpen(true);
+                  }}
                 >
                   <div className="relative aspect-[16/9] overflow-hidden">
                     <img
@@ -134,6 +142,11 @@ export default function Menu() {
                     <h3 className="font-poppins font-bold text-xl text-foreground mb-2" data-testid={`text-menu-item-name-${item.id}`}>
                       {item.nameDE}
                     </h3>
+                    {item.protein && (
+                      <Badge variant="secondary" className="mb-2 font-lato" data-testid={`badge-protein-${item.id}`}>
+                        {item.protein}
+                      </Badge>
+                    )}
                     <p className="font-lato text-sm text-muted-foreground mb-4 line-clamp-2" data-testid={`text-menu-item-desc-${item.id}`}>
                       {item.descriptionDE}
                     </p>
@@ -142,7 +155,10 @@ export default function Menu() {
                         €{item.price}
                       </span>
                       <Button
-                        onClick={() => handleAddToCart(item)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddToCart(item);
+                        }}
                         disabled={item.available === 0}
                         className="bg-sunset hover:bg-sunset-dark text-white font-poppins font-bold rounded-full px-6 shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         data-testid={`button-add-to-cart-${item.id}`}
@@ -167,6 +183,14 @@ export default function Menu() {
       {/* Cart Widget & Modal */}
       <CartWidget onOpen={() => setCartModalOpen(true)} />
       <CartModal isOpen={cartModalOpen} onClose={() => setCartModalOpen(false)} />
+      
+      {/* Menu Item Detail Dialog */}
+      <MenuItemDialog
+        item={selectedItem}
+        isOpen={itemDialogOpen}
+        onClose={() => setItemDialogOpen(false)}
+        onAddToCart={handleAddToCart}
+      />
     </div>
   );
 }

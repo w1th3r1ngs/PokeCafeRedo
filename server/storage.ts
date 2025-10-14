@@ -5,6 +5,7 @@ import {
   type InsertMenuItem 
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { categories as seedCategories, createMenuItems } from "./data/menu";
 
 export interface IStorage {
   // Categories
@@ -29,229 +30,55 @@ export class MemStorage implements IStorage {
     this.initializeData();
   }
 
-  // Initialize with sample data
+  // Initialize with PokePao menu data
   private initializeData() {
-    // Create Categories
-    const bowlsCat = this.createCategorySync({
-      name: "Poke Bowls",
-      nameDE: "Poke Bowls",
-      order: 1,
-    });
+    // Create all categories
+    const createdCategories = seedCategories.map(cat => this.createCategorySync(cat));
+    
+    // Map category names to IDs
+    const categoryIds = {
+      bowls: createdCategories[0].id,
+      wraps: createdCategories[1].id,
+      appetizers: createdCategories[2].id,
+      desserts: createdCategories[3].id,
+      drinks: createdCategories[4].id,
+    };
 
-    const baoCat = this.createCategorySync({
-      name: "Bao Buns",
-      nameDE: "Bao Buns",
-      order: 2,
-    });
-
-    const drinksCat = this.createCategorySync({
-      name: "Drinks",
-      nameDE: "Getränke",
-      order: 3,
-    });
-
-    const sidesCat = this.createCategorySync({
-      name: "Sides",
-      nameDE: "Beilagen",
-      order: 4,
-    });
-
-    // Create Poke Bowls
-    this.createMenuItemSync({
-      name: "Classic Salmon Bowl",
-      nameDE: "Klassische Lachs Bowl",
-      description: "Fresh salmon, avocado, edamame, cucumber, sesame, soy sauce",
-      descriptionDE: "Frischer Lachs, Avocado, Edamame, Gurke, Sesam, Sojasauce",
-      price: "12.90",
-      image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop",
-      categoryId: bowlsCat.id,
-      available: 1,
-      popular: 1,
-    });
-
-    this.createMenuItemSync({
-      name: "Spicy Tuna Bowl",
-      nameDE: "Scharfe Thunfisch Bowl",
-      description: "Spicy tuna, kimchi, jalapeño, spring onion, spicy mayo, crispy onions",
-      descriptionDE: "Scharfer Thunfisch, Kimchi, Jalapeño, Frühlingszwiebel, scharfe Mayo, knusprige Zwiebeln",
-      price: "13.50",
-      image: "https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=800&h=600&fit=crop",
-      categoryId: bowlsCat.id,
-      available: 1,
-      popular: 1,
-    });
-
-    this.createMenuItemSync({
-      name: "Vegetarian Rainbow Bowl",
-      nameDE: "Vegetarische Rainbow Bowl",
-      description: "Tofu, carrot, red cabbage, avocado, corn, sesame dressing",
-      descriptionDE: "Tofu, Karotte, Rotkohl, Avocado, Mais, Sesam-Dressing",
-      price: "11.90",
-      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=600&fit=crop",
-      categoryId: bowlsCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    this.createMenuItemSync({
-      name: "Chicken Teriyaki Bowl",
-      nameDE: "Hähnchen Teriyaki Bowl",
-      description: "Grilled chicken, pineapple, edamame, teriyaki sauce, sesame",
-      descriptionDE: "Gegrilltes Hähnchen, Ananas, Edamame, Teriyaki-Sauce, Sesam",
-      price: "12.50",
-      image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop",
-      categoryId: bowlsCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    this.createMenuItemSync({
-      name: "Shrimp Paradise Bowl",
-      nameDE: "Garnelen Paradise Bowl",
-      description: "Marinated shrimp, mango, avocado, cucumber, sweet chili sauce",
-      descriptionDE: "Marinierte Garnelen, Mango, Avocado, Gurke, Sweet-Chili-Sauce",
-      price: "14.90",
-      image: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&h=600&fit=crop",
-      categoryId: bowlsCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    this.createMenuItemSync({
-      name: "Build Your Own Bowl",
-      nameDE: "Deine eigene Bowl",
-      description: "Choose your base, protein, toppings, and dressing",
-      descriptionDE: "Wähle deine Basis, Protein, Toppings und Dressing",
-      price: "9.50",
-      image: "https://images.unsplash.com/photo-1559847844-5315695dadae?w=800&h=600&fit=crop",
-      categoryId: bowlsCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    // Create Bao Buns
-    this.createMenuItemSync({
-      name: "Crispy Chicken Bao",
-      nameDE: "Knuspriges Hähnchen Bao",
-      description: "Crispy chicken, coleslaw, sriracha mayo, cucumber",
-      descriptionDE: "Knuspriges Hähnchen, Krautsalat, Sriracha-Mayo, Gurke",
-      price: "5.90",
-      image: "https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=800&h=600&fit=crop",
-      categoryId: baoCat.id,
-      available: 1,
-      popular: 1,
-    });
-
-    this.createMenuItemSync({
-      name: "Pulled Pork Bao",
-      nameDE: "Pulled Pork Bao",
-      description: "Slow-cooked pork, hoisin sauce, pickled vegetables, cilantro",
-      descriptionDE: "Langsam gegartes Schweinefleisch, Hoisin-Sauce, eingelegtes Gemüse, Koriander",
-      price: "6.50",
-      image: "https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=800&h=600&fit=crop",
-      categoryId: baoCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    this.createMenuItemSync({
-      name: "Tofu Teriyaki Bao",
-      nameDE: "Tofu Teriyaki Bao",
-      description: "Marinated tofu, teriyaki glaze, sesame, spring onion",
-      descriptionDE: "Marinierter Tofu, Teriyaki-Glasur, Sesam, Frühlingszwiebel",
-      price: "5.50",
-      image: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&h=600&fit=crop",
-      categoryId: baoCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    // Create Drinks
-    this.createMenuItemSync({
-      name: "Homemade Lemonade",
-      nameDE: "Hausgemachte Limonade",
-      description: "Fresh lemon, mint, sparkling water",
-      descriptionDE: "Frische Zitrone, Minze, Sprudelwasser",
-      price: "3.90",
-      image: "https://images.unsplash.com/photo-1523677011781-c91d1bbe2f9d?w=800&h=600&fit=crop",
-      categoryId: drinksCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    this.createMenuItemSync({
-      name: "Mango Smoothie",
-      nameDE: "Mango Smoothie",
-      description: "Fresh mango, coconut milk, ice",
-      descriptionDE: "Frische Mango, Kokosmilch, Eis",
-      price: "4.50",
-      image: "https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=800&h=600&fit=crop",
-      categoryId: drinksCat.id,
-      available: 1,
-      popular: 1,
-    });
-
-    this.createMenuItemSync({
-      name: "Green Tea",
-      nameDE: "Grüner Tee",
-      description: "Premium Japanese green tea",
-      descriptionDE: "Premium japanischer grüner Tee",
-      price: "2.90",
-      image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&h=600&fit=crop",
-      categoryId: drinksCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    // Create Sides
-    this.createMenuItemSync({
-      name: "Edamame",
-      nameDE: "Edamame",
-      description: "Steamed soybeans with sea salt",
-      descriptionDE: "Gedämpfte Sojabohnen mit Meersalz",
-      price: "3.50",
-      image: "https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=800&h=600&fit=crop",
-      categoryId: sidesCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    this.createMenuItemSync({
-      name: "Wakame Salad",
-      nameDE: "Wakame Salat",
-      description: "Seaweed salad with sesame dressing",
-      descriptionDE: "Seetang-Salat mit Sesam-Dressing",
-      price: "4.90",
-      image: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=600&fit=crop",
-      categoryId: sidesCat.id,
-      available: 1,
-      popular: 0,
-    });
-
-    this.createMenuItemSync({
-      name: "Miso Soup",
-      nameDE: "Miso Suppe",
-      description: "Traditional miso soup with tofu and seaweed",
-      descriptionDE: "Traditionelle Miso-Suppe mit Tofu und Seetang",
-      price: "3.90",
-      image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&h=600&fit=crop",
-      categoryId: sidesCat.id,
-      available: 1,
-      popular: 0,
-    });
+    // Create all menu items
+    const menuItemsData = createMenuItems(categoryIds);
+    menuItemsData.forEach(item => this.createMenuItemSync(item));
   }
+
 
   // Sync version for initialization
   private createCategorySync(category: InsertCategory): Category {
     const id = randomUUID();
-    const cat: Category = { ...category, id };
+    const cat: Category = { 
+      ...category, 
+      id,
+      order: category.order ?? 0,
+    };
     this.categories.set(id, cat);
     return cat;
   }
 
   private createMenuItemSync(menuItem: InsertMenuItem): MenuItem {
     const id = randomUUID();
-    const item: MenuItem = { ...menuItem, id };
+    const item: MenuItem = { 
+      ...menuItem, 
+      id,
+      available: menuItem.available ?? 1,
+      popular: menuItem.popular ?? 0,
+      priceSmall: menuItem.priceSmall ?? null,
+      priceLarge: menuItem.priceLarge ?? null,
+      protein: menuItem.protein ?? null,
+      marinade: menuItem.marinade ?? null,
+      ingredients: menuItem.ingredients ?? null,
+      sauce: menuItem.sauce ?? null,
+      toppings: menuItem.toppings ?? null,
+      allergens: menuItem.allergens ?? null,
+      hasSizeOptions: menuItem.hasSizeOptions ?? 0,
+    };
     this.menuItems.set(id, item);
     return item;
   }
@@ -267,7 +94,11 @@ export class MemStorage implements IStorage {
 
   async createCategory(category: InsertCategory): Promise<Category> {
     const id = randomUUID();
-    const cat: Category = { ...category, id };
+    const cat: Category = { 
+      ...category, 
+      id,
+      order: category.order ?? 0,
+    };
     this.categories.set(id, cat);
     return cat;
   }
@@ -289,7 +120,21 @@ export class MemStorage implements IStorage {
 
   async createMenuItem(menuItem: InsertMenuItem): Promise<MenuItem> {
     const id = randomUUID();
-    const item: MenuItem = { ...menuItem, id };
+    const item: MenuItem = { 
+      ...menuItem, 
+      id,
+      available: menuItem.available ?? 1,
+      popular: menuItem.popular ?? 0,
+      priceSmall: menuItem.priceSmall ?? null,
+      priceLarge: menuItem.priceLarge ?? null,
+      protein: menuItem.protein ?? null,
+      marinade: menuItem.marinade ?? null,
+      ingredients: menuItem.ingredients ?? null,
+      sauce: menuItem.sauce ?? null,
+      toppings: menuItem.toppings ?? null,
+      allergens: menuItem.allergens ?? null,
+      hasSizeOptions: menuItem.hasSizeOptions ?? 0,
+    };
     this.menuItems.set(id, item);
     return item;
   }

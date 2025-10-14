@@ -26,10 +26,19 @@ export const menuItems = pgTable("menu_items", {
   description: text("description").notNull(),
   descriptionDE: text("description_de").notNull(),
   price: decimal("price", { precision: 10, scale: 2 }).notNull(),
+  priceSmall: decimal("price_small", { precision: 10, scale: 2 }),
+  priceLarge: decimal("price_large", { precision: 10, scale: 2 }),
   image: text("image").notNull(),
   categoryId: varchar("category_id").notNull().references(() => categories.id),
   available: integer("available").notNull().default(1), // 1 = available, 0 = not available
   popular: integer("popular").notNull().default(0), // 1 = popular item
+  protein: text("protein"),
+  marinade: text("marinade"),
+  ingredients: text("ingredients").array(),
+  sauce: text("sauce"),
+  toppings: text("toppings").array(),
+  allergens: text("allergens").array(),
+  hasSizeOptions: integer("has_size_options").notNull().default(0), // 1 = has size options
 });
 
 export const insertMenuItemSchema = createInsertSchema(menuItems).omit({
@@ -48,6 +57,7 @@ export const cartItemSchema = z.object({
   price: z.string(),
   image: z.string(),
   quantity: z.number().int().positive(),
+  size: z.enum(["klein", "standard"]).optional(),
 });
 
 export type CartItem = z.infer<typeof cartItemSchema>;
