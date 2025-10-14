@@ -143,7 +143,7 @@ export function Gallery3D() {
         </p>
 
         {/* 3D Carousel */}
-        <div className="relative mb-16">
+        <div className="mb-8">
           <div 
             className="perspective-1000 h-[400px] md:h-[500px] relative overflow-hidden cursor-grab active:cursor-grabbing"
             onMouseDown={handleMouseDown}
@@ -152,66 +152,74 @@ export function Gallery3D() {
             onMouseLeave={handleMouseLeave}
           >
             <div className="absolute inset-0 flex items-center justify-center preserve-3d select-none">
-              {allImages.map((image, index) => (
-                <div
-                  key={image.id}
-                  className="absolute w-[280px] md:w-[400px] h-[200px] md:h-[300px] transition-all duration-700 ease-out"
-                  style={getImageStyle(index)}
-                  data-testid={`gallery-image-${index}`}
-                >
-                  <Card className="w-full h-full overflow-hidden relative group">
-                    <img
-                      src={image.url}
-                      alt={image.filename}
-                      className="w-full h-full object-cover"
-                    />
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openFullscreen(index);
-                      }}
-                      className="absolute top-2 left-2 bg-background/80 text-foreground p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover-elevate"
-                      data-testid={`button-zoom-${image.id}`}
+              {allImages.map((image, index) => {
+                const isCenter = index === currentIndex;
+                return (
+                  <div
+                    key={image.id}
+                    className="absolute w-[280px] md:w-[400px] h-[200px] md:h-[300px] transition-all duration-700 ease-out"
+                    style={getImageStyle(index)}
+                    data-testid={`gallery-image-${index}`}
+                  >
+                    <Card 
+                      className="w-full h-full overflow-hidden relative group"
+                      onClick={() => isCenter && openFullscreen(index)}
                     >
-                      <ZoomIn className="w-4 h-4" />
-                    </button>
-                    {!image.id.startsWith('default-') && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteMutation.mutate(image.id);
-                        }}
-                        className="absolute top-2 right-2 bg-destructive text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                        data-testid={`button-delete-${image.id}`}
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                  </Card>
-                </div>
-              ))}
+                      <img
+                        src={image.url}
+                        alt={image.filename}
+                        className={`w-full h-full object-cover ${isCenter ? 'cursor-pointer' : ''}`}
+                      />
+                      {isCenter && (
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-background/80 text-foreground p-3 rounded-full">
+                            <ZoomIn className="w-6 h-6" />
+                          </div>
+                        </div>
+                      )}
+                      {!image.id.startsWith('default-') && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteMutation.mutate(image.id);
+                          }}
+                          className="absolute top-2 right-2 bg-destructive text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          data-testid={`button-delete-${image.id}`}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </Card>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
-          {/* Navigation Buttons */}
-          <Button
-            onClick={prevSlide}
-            variant="outline"
-            size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full z-20 bg-background/90 hover:bg-background"
-            data-testid="button-prev"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </Button>
-          <Button
-            onClick={nextSlide}
-            variant="outline"
-            size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full z-20 bg-background/90 hover:bg-background"
-            data-testid="button-next"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </Button>
+          {/* Navigation Buttons - Under Gallery */}
+          <div className="flex items-center justify-center gap-4 mt-8">
+            <Button
+              onClick={prevSlide}
+              variant="outline"
+              size="icon"
+              className="rounded-full"
+              data-testid="button-prev"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </Button>
+            <span className="font-poppins text-sm text-muted-foreground">
+              {currentIndex + 1} / {allImages.length}
+            </span>
+            <Button
+              onClick={nextSlide}
+              variant="outline"
+              size="icon"
+              className="rounded-full"
+              data-testid="button-next"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </Button>
+          </div>
         </div>
       </div>
 
