@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -17,7 +16,7 @@ const defaultImages = [
 
 export function Gallery3D() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [uploadUrl, setUploadUrl] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadFilename, setUploadFilename] = useState("");
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -29,8 +28,18 @@ export function Gallery3D() {
   const allImages = [...defaultImages, ...uploadedImages];
 
   const uploadMutation = useMutation({
-    mutationFn: async (data: { url: string; filename: string }) => {
-      return apiRequest("POST", "/api/gallery", data);
+    mutationFn: async (formData: FormData) => {
+      const response = await fetch("/api/gallery", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Upload failed");
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gallery"] });
@@ -38,7 +47,7 @@ export function Gallery3D() {
         title: "Bild hochgeladen!",
         description: "Das Bild wurde erfolgreich zur Galerie hinzugefügt.",
       });
-      setUploadUrl("");
+      setSelectedFile(null);
       setUploadFilename("");
     },
     onError: () => {
@@ -52,7 +61,16 @@ export function Gallery3D() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest("DELETE", `/api/gallery/${id}`);
+      const response = await fetch(`/api/gallery/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      
+      if (!response.ok) {
+        throw new Error("Delete failed");
+      }
+      
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/gallery"] });
@@ -71,9 +89,21 @@ export function Gallery3D() {
     setCurrentIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+      if (!uploadFilename) {
+        setUploadFilename(e.target.files[0].name);
+      }
+    }
+  };
+
   const handleUpload = () => {
-    if (uploadUrl && uploadFilename) {
-      uploadMutation.mutate({ url: uploadUrl, filename: uploadFilename });
+    if (selectedFile) {
+      const formData = new FormData();
+      formData.append("image", selectedFile);
+      formData.append("filename", uploadFilename || selectedFile.name);
+      uploadMutation.mutate(formData);
     }
   };
 
@@ -173,18 +203,22 @@ export function Gallery3D() {
           </h3>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="image-url">Bild URL</Label>
+              <Label htmlFor="image-file">Bild auswählen</Label>
               <Input
-                id="image-url"
-                type="url"
-                placeholder="https://example.com/image.jpg"
-                value={uploadUrl}
-                onChange={(e) => setUploadUrl(e.target.value)}
-                data-testid="input-image-url"
+                id="image-file"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                data-testid="input-image-file"
               />
+              {selectedFile && (
+                <p className="text-sm text-muted-foreground mt-2" data-testid="text-selected-file">
+                  Ausgewählt: {selectedFile.name}
+                </p>
+              )}
             </div>
             <div>
-              <Label htmlFor="image-name">Bildname</Label>
+              <Label htmlFor="image-name">Bildname (optional)</Label>
               <Input
                 id="image-name"
                 type="text"
@@ -196,7 +230,7 @@ export function Gallery3D() {
             </div>
             <Button
               onClick={handleUpload}
-              disabled={!uploadUrl || !uploadFilename || uploadMutation.isPending}
+              disabled={!selectedFile || uploadMutation.isPending}
               className="w-full bg-ocean hover:bg-ocean-dark font-poppins"
               data-testid="button-upload"
             >

@@ -2,8 +2,38 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertReservationSchema, insertGalleryImageSchema } from "@shared/schema";
+import multer from "multer";
+import path from "path";
+import { promises as fs } from "fs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Configure multer for file uploads
+  const uploadDir = path.join(process.cwd(), "client/public/uploads");
+  
+  // Ensure upload directory exists
+  await fs.mkdir(uploadDir, { recursive: true });
+
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: uploadDir,
+      filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+      },
+    }),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+    fileFilter: (req, file, cb) => {
+      const allowedTypes = /jpeg|jpg|png|gif|webp/;
+      const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+      const mimetype = allowedTypes.test(file.mimetype);
+      
+      if (mimetype && extname) {
+        return cb(null, true);
+      }
+      cb(new Error("Only image files are allowed"));
+    },
+  });
+
   // Get all categories
   app.get("/api/categories", async (req, res) => {
     try {
@@ -66,8 +96,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertReservationSchema.parse(req.body);
       const reservation = await storage.createReservation(validatedData);
       res.status(201).json(reservation);
-    } catch (error) {
-      res.status(400).json({ error: "Invalid reservation data" });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: "Invalid reservation data" });
+      }
+      res.status(500).json({ error: "Failed to create reservation" });
     }
   });
 
@@ -81,13 +114,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/gallery", async (req, res) => {
+  app.post("/api/gallery", upload.single("image"), async (req, res) => {
     try {
-      const validatedData = insertGalleryImageSchema.parse(req.body);
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+      }
+
+      const imageData = {
+        url: `/uploads/${req.file.filename}`,
+        filename: req.body.filename || req.file.originalname,
+      };
+
+      const validatedData = insertGalleryImageSchema.parse(imageData);
       const image = await storage.createGalleryImage(validatedData);
       res.status(201).json(image);
-    } catch (error) {
-      res.status(400).json({ error: "Invalid gallery image data" });
+    } catch (error: any) {
+      if (error.name === 'ZodError') {
+        return res.status(400).json({ error: "Invalid gallery image data" });
+      }
+      res.status(500).json({ error: "Failed to upload image" });
     }
   });
 
