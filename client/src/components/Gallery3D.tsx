@@ -2,7 +2,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react";
 import { type GalleryImage } from "@shared/schema";
 
 const defaultImages = [
@@ -16,6 +18,8 @@ export function Gallery3D() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
+  const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
+  const [fullscreenImageIndex, setFullscreenImageIndex] = useState(0);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -79,6 +83,27 @@ export function Gallery3D() {
     }
   };
 
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
+  const openFullscreen = (index: number) => {
+    setFullscreenImageIndex(index);
+    setIsFullscreenOpen(true);
+  };
+
+  const nextFullscreenImage = () => {
+    setFullscreenImageIndex((prev) => (prev + 1) % allImages.length);
+  };
+
+  const prevFullscreenImage = () => {
+    setFullscreenImageIndex((prev) => (prev - 1 + allImages.length) % allImages.length);
+  };
+
   const getImageStyle = (index: number) => {
     const diff = index - currentIndex;
     const totalImages = allImages.length;
@@ -140,9 +165,22 @@ export function Gallery3D() {
                       alt={image.filename}
                       className="w-full h-full object-cover"
                     />
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openFullscreen(index);
+                      }}
+                      className="absolute top-2 left-2 bg-background/80 text-foreground p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover-elevate"
+                      data-testid={`button-zoom-${image.id}`}
+                    >
+                      <ZoomIn className="w-4 h-4" />
+                    </button>
                     {!image.id.startsWith('default-') && (
                       <button
-                        onClick={() => deleteMutation.mutate(image.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteMutation.mutate(image.id);
+                        }}
                         className="absolute top-2 right-2 bg-destructive text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                         data-testid={`button-delete-${image.id}`}
                       >
@@ -154,8 +192,72 @@ export function Gallery3D() {
               ))}
             </div>
           </div>
+
+          {/* Navigation Buttons */}
+          <Button
+            onClick={prevSlide}
+            variant="outline"
+            size="icon"
+            className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full z-20 bg-background/90 hover:bg-background"
+            data-testid="button-prev"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+          <Button
+            onClick={nextSlide}
+            variant="outline"
+            size="icon"
+            className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full z-20 bg-background/90 hover:bg-background"
+            data-testid="button-next"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </Button>
         </div>
       </div>
+
+      {/* Fullscreen Dialog */}
+      <Dialog open={isFullscreenOpen} onOpenChange={setIsFullscreenOpen}>
+        <DialogContent className="max-w-[95vw] max-h-[95vh] p-0 bg-black/95 border-none">
+          <DialogTitle className="sr-only">
+            {allImages[fullscreenImageIndex]?.filename || 'Bild'}
+          </DialogTitle>
+          <div className="relative w-full h-[95vh] flex items-center justify-center">
+            <img
+              src={allImages[fullscreenImageIndex]?.url}
+              alt={allImages[fullscreenImageIndex]?.filename}
+              className="max-w-full max-h-full object-contain"
+              data-testid="fullscreen-image"
+            />
+            
+            {/* Fullscreen Navigation */}
+            <Button
+              onClick={prevFullscreenImage}
+              variant="outline"
+              size="icon"
+              className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-background/90 hover:bg-background"
+              data-testid="button-fullscreen-prev"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </Button>
+            <Button
+              onClick={nextFullscreenImage}
+              variant="outline"
+              size="icon"
+              className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-background/90 hover:bg-background"
+              data-testid="button-fullscreen-next"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </Button>
+
+            {/* Image Counter */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-background/90 px-4 py-2 rounded-full">
+              <span className="font-poppins text-sm" data-testid="text-image-counter">
+                {fullscreenImageIndex + 1} / {allImages.length}
+              </span>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <style>{`
         .perspective-1000 {
