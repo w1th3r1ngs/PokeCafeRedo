@@ -62,8 +62,7 @@ export default function Contact() {
                 <div>
                   <h3 className="font-poppins font-bold text-lg text-ocean mb-2">Öffnungszeiten</h3>
                   <div className="font-lato text-muted-foreground space-y-1" data-testid="text-hours">
-                    <p>Mo-Fr: 11:00 - 21:00</p>
-                    <p>Sa-So: 12:00 - 21:00</p>
+                    <p>Mo-So: 11:15 - 21:00</p>
                   </div>
                 </div>
               </div>
