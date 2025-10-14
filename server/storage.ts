@@ -2,7 +2,11 @@ import {
   type Category, 
   type InsertCategory, 
   type MenuItem, 
-  type InsertMenuItem 
+  type InsertMenuItem,
+  type Reservation,
+  type InsertReservation,
+  type GalleryImage,
+  type InsertGalleryImage
 } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { categories as seedCategories, createMenuItems } from "./data/menu";
@@ -18,15 +22,30 @@ export interface IStorage {
   getMenuItemById(id: string): Promise<MenuItem | undefined>;
   getMenuItemsByCategory(categoryId: string): Promise<MenuItem[]>;
   createMenuItem(menuItem: InsertMenuItem): Promise<MenuItem>;
+
+  // Reservations
+  getAllReservations(): Promise<Reservation[]>;
+  getReservationById(id: string): Promise<Reservation | undefined>;
+  createReservation(reservation: InsertReservation): Promise<Reservation>;
+
+  // Gallery Images
+  getAllGalleryImages(): Promise<GalleryImage[]>;
+  getGalleryImageById(id: string): Promise<GalleryImage | undefined>;
+  createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage>;
+  deleteGalleryImage(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
   private categories: Map<string, Category>;
   private menuItems: Map<string, MenuItem>;
+  private reservations: Map<string, Reservation>;
+  private galleryImages: Map<string, GalleryImage>;
 
   constructor() {
     this.categories = new Map();
     this.menuItems = new Map();
+    this.reservations = new Map();
+    this.galleryImages = new Map();
     this.initializeData();
   }
 
@@ -137,6 +156,51 @@ export class MemStorage implements IStorage {
     };
     this.menuItems.set(id, item);
     return item;
+  }
+
+  // Reservations
+  async getAllReservations(): Promise<Reservation[]> {
+    return Array.from(this.reservations.values());
+  }
+
+  async getReservationById(id: string): Promise<Reservation | undefined> {
+    return this.reservations.get(id);
+  }
+
+  async createReservation(reservation: InsertReservation): Promise<Reservation> {
+    const id = randomUUID();
+    const res: Reservation = { 
+      ...reservation, 
+      id,
+    };
+    this.reservations.set(id, res);
+    return res;
+  }
+
+  // Gallery Images
+  async getAllGalleryImages(): Promise<GalleryImage[]> {
+    return Array.from(this.galleryImages.values()).sort((a, b) => 
+      new Date(b.uploadedAt).getTime() - new Date(a.uploadedAt).getTime()
+    );
+  }
+
+  async getGalleryImageById(id: string): Promise<GalleryImage | undefined> {
+    return this.galleryImages.get(id);
+  }
+
+  async createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage> {
+    const id = randomUUID();
+    const img: GalleryImage = { 
+      ...image, 
+      id,
+      uploadedAt: new Date().toISOString(),
+    };
+    this.galleryImages.set(id, img);
+    return img;
+  }
+
+  async deleteGalleryImage(id: string): Promise<boolean> {
+    return this.galleryImages.delete(id);
   }
 }
 

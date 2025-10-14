@@ -69,3 +69,36 @@ export const cartSchema = z.object({
 });
 
 export type Cart = z.infer<typeof cartSchema>;
+
+// Reservations
+export const reservations = pgTable("reservations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: text("name").notNull(),
+  guests: integer("guests").notNull(),
+  phone: text("phone").notNull(),
+  date: text("date").notNull(),
+  time: text("time").notNull(),
+});
+
+export const insertReservationSchema = createInsertSchema(reservations).omit({
+  id: true,
+});
+
+export type Reservation = typeof reservations.$inferSelect;
+export type InsertReservation = z.infer<typeof insertReservationSchema>;
+
+// Gallery Images
+export const galleryImages = pgTable("gallery_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  url: text("url").notNull(),
+  filename: text("filename").notNull(),
+  uploadedAt: text("uploaded_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const insertGalleryImageSchema = createInsertSchema(galleryImages).omit({
+  id: true,
+  uploadedAt: true,
+});
+
+export type GalleryImage = typeof galleryImages.$inferSelect;
+export type InsertGalleryImage = z.infer<typeof insertGalleryImageSchema>;
