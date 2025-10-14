@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Hero } from "@/components/Hero";
 import { Gallery3D } from "@/components/Gallery3D";
+import { ReservationForm } from "@/components/ReservationForm";
 import { Truck, ShoppingBag, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -132,6 +133,21 @@ export default function Home() {
               <p className="font-lato text-muted-foreground">Ausgezeichnet als Deutschlands beste Poke Bowl</p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Reservation Section */}
+      <section className="py-16 md:py-24">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="font-poppins text-3xl md:text-4xl font-bold text-ocean mb-4" data-testid="text-reservation-section-title">
+              Tisch reservieren
+            </h2>
+            <p className="font-lato text-lg text-muted-foreground max-w-2xl mx-auto" data-testid="text-reservation-section-subtitle">
+              Sichere dir deinen Platz bei uns
+            </p>
+          </div>
+          <ReservationForm />
         </div>
       </section>
 

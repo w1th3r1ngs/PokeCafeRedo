@@ -1,6 +1,5 @@
 import { Phone, MapPin, Clock, Star } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { ReservationForm } from "@/components/ReservationForm";
 import { Button } from "@/components/ui/button";
 
 export default function Contact() {
@@ -89,14 +88,6 @@ export default function Contact() {
                 data-testid="iframe-map"
               />
             </div>
-          </div>
-
-          {/* Reservation Form */}
-          <div className="mb-16">
-            <h2 className="font-poppins text-3xl md:text-4xl font-bold text-ocean mb-8 text-center" data-testid="text-reservation-section-title">
-              Tisch reservieren
-            </h2>
-            <ReservationForm />
           </div>
 
           {/* Reviews Section */}
