@@ -773,7 +773,7 @@ export const createMenuItems = (categoryIds: { bowls: string, wraps: string, app
     description: "Fresh alcohol-free quality beer",
     descriptionDE: "frisches alkoholfreies Qualitätsbier",
     price: "3.50",
-    image: "/images/stock_images/beer_bottle_heineken_93927212.jpg",
+    image: "/images/image_1760608442538.png",
     categoryId: categoryIds.drinks,
     available: 1,
     popular: 0,

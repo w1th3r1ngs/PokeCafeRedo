@@ -143,11 +143,11 @@ export default function Menu() {
                       setItemDialogOpen(true);
                     }}
                   >
-                  <div className="relative aspect-[16/9] overflow-hidden">
+                  <div className="relative aspect-[16/9] overflow-hidden bg-white">
                     <img
                       src={item.image}
                       alt={item.nameDE}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                       data-testid={`img-menu-item-${item.id}`}
                     />
                     {item.popular === 1 && (
