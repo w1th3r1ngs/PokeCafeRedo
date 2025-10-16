@@ -1,6 +1,6 @@
 import { Heart, Users, Award, Leaf } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import image from "@/assets/image.png";
+import image from "@assets/image.png";
 
 export default function About() {
   return (
