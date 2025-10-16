@@ -647,4 +647,52 @@ export const createMenuItems = (categoryIds: { bowls: string, wraps: string, app
     available: 1,
     popular: 1,
   },
+  {
+    name: "Heineken 0.0",
+    nameDE: "Heineken 0.0",
+    description: "Alcohol-free Heineken with full taste",
+    descriptionDE: "Alkoholfreies Heineken mit vollem Geschmack",
+    price: "3.50",
+    image: "/images/beer-bottle.jpg",
+    categoryId: categoryIds.drinks,
+    available: 1,
+    popular: 0,
+  },
+  
+  // Drinks - Fritz Cola
+  {
+    name: "Fritz Kola",
+    nameDE: "Fritz Kola",
+    description: "Cult cola from Hamburg with extra caffeine",
+    descriptionDE: "Kult-Cola aus Hamburg mit extra Koffein",
+    price: "3.50",
+    image: "/images/fritz-cola.jpg",
+    categoryId: categoryIds.drinks,
+    available: 1,
+    popular: 1,
+  },
+  
+  // Drinks - Coffee
+  {
+    name: "Cappuccino",
+    nameDE: "Cappuccino",
+    description: "Italian cappuccino with creamy milk foam",
+    descriptionDE: "Italienischer Cappuccino mit cremigem Milchschaum",
+    price: "3.50",
+    image: "/images/cappuccino-latte.jpg",
+    categoryId: categoryIds.drinks,
+    available: 1,
+    popular: 1,
+  },
+  {
+    name: "Espresso",
+    nameDE: "Espresso",
+    description: "Strong Italian espresso",
+    descriptionDE: "Kräftiger italienischer Espresso",
+    price: "2.50",
+    image: "/images/coffee-espresso.jpg",
+    categoryId: categoryIds.drinks,
+    available: 1,
+    popular: 0,
+  },
 ];

@@ -133,7 +133,7 @@ export default function Menu() {
               {filteredItems.map((item, index) => (
                 <AnimatedSection 
                   key={item.id}
-                  delay={index * 0.05}
+                  delay={0}
                 >
                   <Card
                     className="overflow-hidden hover:shadow-lg transition-all duration-300 group cursor-pointer"
