@@ -1,5 +1,6 @@
 import { Heart, Users, Award, Leaf } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import image from "@/assets/image.png";
 
 export default function About() {
   return (
@@ -22,7 +23,7 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center mb-16">
             <div>
               <img
-                src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop"
+                src={image}
                 alt="Fresh Poke Bowl"
                 className="rounded-2xl shadow-2xl w-full h-auto"
                 data-testid="img-about-hero"
